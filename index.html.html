@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pifagor Trade | On-Chain Analytics</title>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Montserrat:wght@400;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg: #050505;
+            --neon: #00FF41;
+            --text-main: #FFFFFF;
+            --text-muted: #A0A0A0;
+            --target-red: #FF4B4B;
+            --panel-bg: rgba(20, 20, 20, 0.8);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+            background-image: radial-gradient(circle at 15% 50%, rgba(0, 255, 65, 0.04) 0%, transparent 50%),
+                              radial-gradient(circle at 85% 30%, rgba(255, 255, 255, 0.02) 0%, transparent 50%);
+        }
+
+        .slide {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            padding: 3% 5%;
+            box-sizing: border-box;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            pointer-events: none;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch; /* Плавный скролл на iOS */
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+            z-index: 10;
+        }
+
+        .slide::-webkit-scrollbar { width: 6px; }
+        .slide::-webkit-scrollbar-track { background: transparent; }
+        .slide::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+        .slide::-webkit-scrollbar-thumb:hover { background: var(--neon); }
+
+        .logo-top {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            font-size: 1rem;
+            color: transparent;
+            -webkit-text-stroke: 1px var(--neon);
+            letter-spacing: 2px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 50;
+        }
+
+        .logo-top span {
+            font-family: 'Caveat', cursive;
+            font-size: 1.5rem;
+            color: var(--text-main);
+            -webkit-text-stroke: 0;
+        }
+
+        .page-indicator {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            letter-spacing: 2px;
+            z-index: 100;
+        }
+        .page-indicator span.current {
+            color: var(--neon);
+            font-weight: 700;
+        }
+
+        h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2rem;
+            font-weight: 900;
+            margin-bottom: 5px;
+            color: transparent;
+            -webkit-text-stroke: 1.5px var(--text-main);
+            text-transform: uppercase;
+            line-height: 1.1;
+        }
+
+        h1.neon-stroke {
+            -webkit-text-stroke: 1.5px var(--neon);
+        }
+
+        .subtitle {
+            font-family: 'Caveat', cursive;
+            font-size: 1.6rem;
+            color: var(--text-main);
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+
+        .huge-number {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: var(--neon);
+            text-shadow: 0 0 20px rgba(0, 255, 65, 0.4);
+            margin: 0;
+            line-height: 1;
+        }
+
+        .huge-number span {
+            font-size: 2rem;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .text-block p {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #d1d1d1;
+            margin-bottom: 10px;
+        }
+
+        .text-block strong {
+            color: var(--text-main);
+            font-weight: 600;
+        }
+
+        .highlight-green {
+            color: var(--neon);
+            font-weight: 600;
+        }
+
+        .cycle-block {
+            background: var(--panel-bg);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-left: 4px solid var(--neon);
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform 0.2s ease;
+        }
+
+        .cycle-date {
+            font-family: 'Inter', sans-serif;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .cycle-val {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--text-main);
+            white-space: nowrap;
+        }
+
+        .cycle-val span {
+            color: var(--neon);
+            font-family: 'Caveat', cursive;
+            font-size: 1rem;
+        }
+
+        /* Аккордеон */
+        .accordion {
+            background: var(--panel-bg);
+            border: 1px solid rgba(0, 255, 65, 0.2);
+            border-radius: 8px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        .accordion-header {
+            padding: 10px 15px; cursor: pointer; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 0.9rem; color: var(--neon);
+            display: flex; justify-content: space-between; align-items: center; user-select: none; background: rgba(0, 0, 0, 0.3);
+        }
+        .accordion-content {
+            max-height: 0; overflow: hidden; transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1); padding: 0 15px; background: rgba(0, 0, 0, 0.5);
+        }
+        .accordion-content p { margin-top: 10px; margin-bottom: 10px; font-size: 0.85rem; color: #ccc; line-height: 1.5; }
+        .accordion.open .accordion-content { max-height: 1000px; padding-bottom: 10px; }
+        .accordion.open .accordion-header { background: rgba(0, 255, 65, 0.1); }
+
+        .nav-controls { position: fixed; bottom: 20px; right: 20px; display: flex; gap: 10px; z-index: 100; }
+        button { 
+            background: transparent; border: 1px solid rgba(255,255,255,0.2); color: var(--text-main); 
+            padding: 8px 15px; border-radius: 5px; font-family: 'Montserrat', sans-serif; font-weight: 700; 
+            cursor: pointer; font-size: 1rem;
+        }
+        button:hover { border-color: var(--neon); color: var(--neon); }
+
+        .progress-bar { position: fixed; top: 0; left: 0; height: 3px; background: var(--neon); transition: width 0.3s ease; z-index: 100; box-shadow: 0 0 10px var(--neon); }
+
+        .img-container {
+            width: 100%; display: flex; justify-content: center; align-items: center;
+            background: var(--panel-bg); border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 10px; box-sizing: border-box; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .img-container img { width: 100%; height: auto; object-fit: contain; border-radius: 8px; }
+
+        .math-doodle { display: none; /* Скрываем каракули на мобилках */ }
+
+        /* Специфичная кнопка "Полный комментарий" */
+        .comment-btn {
+            background: var(--panel-bg);
+            border: 2px solid var(--neon);
+            border-radius: 8px;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            z-index: 100;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
+            color: var(--neon);
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            font-size: 1rem;
+            margin-top: 10px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); z-index: 200; justify-content: center; align-items: center; padding: 15px; box-sizing: border-box; backdrop-filter: blur(5px);
+        }
+        .modal.show { display: flex; }
+        .modal-content {
+            background: #111; border: 1px solid var(--neon); border-radius: 12px; padding: 20px;
+            max-width: 800px; width: 100%; max-height: 85vh; overflow-y: auto; position: relative; box-shadow: 0 0 50px rgba(0, 255, 65, 0.2);
+        }
+        .modal-content h3 { color: var(--neon); margin-top: 0; font-family: 'Montserrat', sans-serif; border-bottom: 1px solid rgba(0, 255, 65, 0.3); padding-bottom: 10px; font-size: 1.2rem; }
+        .modal-content li { margin-bottom: 10px; line-height: 1.5; color: #ccc; font-size: 0.9rem; }
+        .modal-close { position: absolute; top: 10px; right: 15px; cursor: pointer; color: var(--text-muted); font-size: 1.5rem; font-weight: bold; }
+
+        /* АДАПТАЦИЯ ПОД МОБИЛЬНЫЕ */
+        @media (max-width: 768px) {
+            h1 { font-size: 1.5rem; }
+            .subtitle { font-size: 1.4rem; }
+            .content-grid { grid-template-columns: 1fr; gap: 15px; }
+            .img-container { height: auto !important; margin-top: 15px; }
+            .img-container img { max-height: 40vh; }
+            
+            /* Переопределяем кастомные сетки для слайдов 4 и 6 */
+            .slide .content-grid { grid-template-columns: 1fr !important; }
+            .slide-6-top { grid-template-columns: 1fr !important; text-align: center; }
+            .huge-number { font-size: 3rem; margin-bottom: 10px; }
+
+            .nav-controls { bottom: 15px; right: 15px; }
+            .page-indicator { bottom: 15px; left: 15px; right: auto; }
+            .logo-top { top: 15px; left: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="progress-bar" id="progress"></div>
+    <div class="logo-top">PIFAGOR TRADE <span>math trade</span></div>
+
+    <!-- СЛАЙД 1 -->
+    <div class="slide active" id="slide-1" style="justify-content: center; text-align: center;">
+        <h1 class="neon-stroke">On-Chain Аналитика</h1>
+        <div class="subtitle">Percent Supply In Profit</div>
+        <div style="font-size: 1rem; color: var(--text-muted); margin-top: 30px; line-height: 1.6;">
+            Интерактивный разбор метрики, цикличности и текущего положения рынка на основе данных <strong>Glassnode</strong>.
+        </div>
+        <div style="font-size: 0.8rem; color: #555; margin-top: 40px; letter-spacing: 2px;">СРЕЗ ДАННЫХ: ОКТЯБРЬ 2026</div>
+    </div>
+
+    <!-- СЛАЙД 2 -->
+    <div class="slide" id="slide-2">
+        <h1>Цикличность ATH → ATH</h1>
+        <div class="subtitle">Гармония долгосрочных трендов</div>
+        <div class="content-grid">
+            <div>
+                <div class="text-block">
+                    <p>Каждый цикл на метрике <strong>Percent Supply in Profit</strong> имеет единый характер завершения долгосрочного восходящего тренда: <span class="highlight-green">завершение цикла роста через образование дивергенции</span>.</p>
+                    <p>Это даёт возможность провести сравнительный анализ циклов и объективно оценить время.</p>
+                </div>
+                <div class="accordion">
+                    <div class="accordion-header" onclick="toggleAccordion(this)"><span>Разбор циклов ATH</span><span>▼</span></div>
+                    <div class="accordion-content">
+                        <p>ATH 2025 поставили <strong>14 августа 2025</strong>, заняло времени: <strong>1580 дней</strong>. Отклонения являются допустимыми, так как общая картина выглядит гармонично.</p>
+                        <p>⇒ Циклы от ATH до ATH выглядят гармонично (цикличность сохраняется), следовательно, цикличность от Low до Low также будет сохранена.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="img-container"><img src="graph_ath.png" alt="График ATH-ATH"></div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 3 -->
+    <div class="slide" id="slide-3">
+        <h1>Цикличность Low → Low</h1>
+        <div class="subtitle">Поиск истинного дна</div>
+        <div class="content-grid">
+            <div>
+                <div class="cycle-block"><div class="cycle-date">22.11.2011 — 12.06.2015</div><div class="cycle-val">1298 <span>дн.</span></div></div>
+                <div class="cycle-block"><div class="cycle-date">12.06.2015 — 16.02.2019</div><div class="cycle-val">1345 <span>дн.</span></div></div>
+                <div class="cycle-block"><div class="cycle-date">16.02.2019 — 29.11.2022</div><div class="cycle-val">1382 <span>дн.</span></div></div>
+                <div class="cycle-block" style="border-left-color: var(--target-red); background: rgba(255, 75, 75, 0.08);">
+                    <div class="cycle-date" style="color: #fff;">29.11.2022 — 16.08.2026</div>
+                    <div class="cycle-val" style="color: var(--target-red);">1356 <span style="color: var(--target-red);">дн.</span></div>
+                </div>
+                <div class="accordion">
+                    <div class="accordion-header" onclick="toggleAccordion(this)"><span>Аргументация по Low</span><span>▼</span></div>
+                    <div class="accordion-content">
+                        <p>С момента образования Low 2022 года прошло <strong>1356 дней</strong>. Временные рамки (норма): [ 1298 - 1382 ] дней.</p>
+                        <p>Ранее полученные данные указывали на то, что следующий Low на метрике будет сформирован в рамках [19 июня - 11 сентября 2026]. В ожидаемом диапазоне он и был сформирован (16 августа 2026). Мы уже вышли за пределы допустимого диапазона, где формирование нового Low являлось наиболее вероятным.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="img-container"><img src="graph_low.png" alt="График Low-Low"></div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 4 -->
+    <div class="slide" id="slide-4">
+        <h1>Моделирование движения</h1>
+        <div class="subtitle">Текущая динамика и цели</div>
+        <div class="content-grid">
+            <div>
+                <div class="text-block">
+                    <p>После разворота на метрике от 16 августа 2026 года прошло 2 месяца. Рост на <strong class="highlight-green">+11.48%</strong>, без обновления локального Low.</p>
+                    <p>Условия выполнены. Данные указывают на факт сформированного дна как на метрике, так и на цене.</p>
+                    <p>Ключевой ориентир — уровень <strong>95% (Target)</strong>. Статистически High на метрике формируется вблизи данного уровня.</p>
+                </div>
+            </div>
+            <div class="img-container"><img src="graph_model.png" alt="График Моделирования"></div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 5 -->
+    <div class="slide" id="slide-5">
+        <h1>Статистика High</h1>
+        <div class="subtitle">Формирование дивергенции</div>
+        <div class="content-grid">
+            <div style="text-align: center; background: var(--panel-bg); border-radius: 12px; border: 1px solid rgba(255, 75, 75, 0.2); padding: 20px;">
+                <div style="font-size: 1rem; color: var(--text-muted); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px;">Зона перегрева</div>
+                <div class="huge-number" style="color: var(--text-main); text-shadow: none; font-size: 3.5rem;">94<span style="font-size: 1.5rem;"> - </span>97<span>%</span></div>
+                <div style="font-family: 'Caveat', cursive; font-size: 1.5rem; color: var(--target-red); margin-top: 10px;">Здесь формируется High цикла</div>
+            </div>
+            <div class="text-block">
+                <p>Статистически в диапазоне от <strong>94 до 97%</strong> показатель формирует High в рамках цикла.</p>
+                <p>После этого образуется <strong class="highlight-green">дивергенция</strong> между ценой и показателем.</p>
+                <p>Следом формируется глобальный разворот тренда в пользу развития нисходящей тенденции.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЛАЙД 6 -->
+    <div class="slide" id="slide-6">
+        <h1>Текущая ситуация</h1>
+        <div class="subtitle">Мы находимся здесь (WE HERE)</div>
+        
+        <div class="content-grid slide-6-top" style="margin-top: 5px; align-items: center;">
+            <div style="text-align: center;">
+                <div class="huge-number">+11.48<span>%</span></div>
+                <div style="font-family: 'Caveat', cursive; font-size: 1.2rem; color: var(--text-muted); margin-top: 5px;">рост за 2 месяца</div>
+            </div>
+            <div class="text-block">
+                <p>Снижение приостановилось на уровне <strong>54.6%</strong> → сильная реакция вверх → рост на <strong>+11.48%</strong> от Low (16 августа 2026). Подобная динамика указывает на смену тренда. Сейчас мы на начальном этапе <strong>“Бычьего тренда”</strong>.</p>
+            </div>
+        </div>
+
+        <div class="img-container" style="margin-top: 10px;">
+            <img src="graph_current.png" alt="График текущей ситуации">
+        </div>
+
+        <div class="comment-btn" onclick="openModal()">
+            <span>Полный комментарий</span>
+            <span>▲</span>
+        </div>
+    </div>
+
+    <!-- Модальное окно -->
+    <div class="modal" id="commentModal" onclick="closeModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-close" onclick="closeModal()">✕</div>
+            <h3>Полный комментарий</h3>
+            <ul>
+                <li>Low на метрике Percent Supply In Profit был сформирован <strong>16 августа 2026 года</strong>. Движение от Low 2022 до Low 2026 заняло 1356 дней, что выглядит крайне гармонично.</li>
+                <li>Более 11.48% предложения перешло из состояния убытка в состояние прибыли.</li>
+                <li>Динамика указывает на смену тренда в пользу развития восходящей тенденции. Дно на метрике и цене Bitcoin сформировано, мы на начальном этапе “Бычьего тренда”.</li>
+                <li>Ключевой ориентир — уровень 95%, вблизи которого формируется High.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="page-indicator">
+        <span class="current" id="current-page">01</span> / <span id="total-pages">06</span>
+    </div>
+
+    <div class="nav-controls">
+        <button onclick="prev()">←</button>
+        <button onclick="next()">→</button>
+    </div>
+
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        const progress = document.getElementById('progress');
+        const currentPageEl = document.getElementById('current-page');
+        const totalPagesEl = document.getElementById('total-pages');
+        
+        let currentSlide = 0;
+        totalPagesEl.innerText = String(slides.length).padStart(2, '0');
+
+        function updateSlide() {
+            slides.forEach((slide, index) => {
+                if (index === currentSlide) {
+                    slide.classList.add('active');
+                    slide.scrollTo({ top: 0, behavior: 'smooth' });
+                } else {
+                    slide.classList.remove('active');
+                }
+            });
+            progress.style.width = ((currentSlide + 1) / slides.length * 100) + '%';
+            currentPageEl.innerText = String(currentSlide + 1).padStart(2, '0');
+        }
+
+        function next() { if (currentSlide < slides.length - 1) { currentSlide++; updateSlide(); } }
+        function prev() { if (currentSlide > 0) { currentSlide--; updateSlide(); } }
+
+        function openModal() { document.getElementById('commentModal').classList.add('show'); }
+        function closeModal(e) {
+            if (e && e.target !== e.currentTarget && e.target.className !== 'modal-close') return;
+            document.getElementById('commentModal').classList.remove('show');
+        }
+
+        function toggleAccordion(header) {
+            const accordion = header.parentElement;
+            accordion.classList.toggle('open');
+            const arrow = header.querySelector('span:last-child');
+            arrow.innerText = accordion.classList.contains('open') ? '▲' : '▼';
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') next();
+            if (e.key === 'ArrowLeft') prev();
+            if (e.key === 'Escape') closeModal();
+        });
+
+        updateSlide();
+    </script>
+</body>
+</html>
