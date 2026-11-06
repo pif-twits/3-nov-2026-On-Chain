@@ -39,6 +39,7 @@
             transition: opacity 0.5s ease, transform 0.5s ease;
             pointer-events: none;
             overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         .slide.active {
@@ -166,11 +167,6 @@
             transition: transform 0.2s ease;
         }
 
-        .cycle-block:hover {
-            transform: translateX(5px);
-            background: rgba(255, 255, 255, 0.05);
-        }
-
         .cycle-date {
             font-family: 'Inter', sans-serif;
             color: var(--text-muted);
@@ -234,28 +230,13 @@
         .doodle-3 { top: 40%; left: 45%; transform: rotate(5deg); font-size: 5rem; opacity: 0.05; }
 
         .comment-btn {
-            background: var(--panel-bg);
-            border: 2px solid var(--neon);
-            border-radius: 8px;
-            padding: 15px 25px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-            z-index: 100;
-            box-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
-            transition: all 0.3s ease;
-            color: var(--neon);
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 900;
-            font-size: 1.2rem;
-            margin-top: 15px;
-            width: 100%;
+            background: var(--panel-bg); border: 2px solid var(--neon); border-radius: 8px;
+            padding: 15px 25px; display: flex; justify-content: space-between; align-items: center;
+            cursor: pointer; z-index: 100; box-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
+            color: var(--neon); font-family: 'Montserrat', sans-serif; font-weight: 900;
+            font-size: 1.2rem; margin-top: 15px; width: 100%; box-sizing: border-box;
         }
-        .comment-btn:hover {
-            background: rgba(0, 255, 65, 0.15);
-            box-shadow: 0 0 30px rgba(0, 255, 65, 0.5);
-        }
+        .comment-btn:hover { background: rgba(0, 255, 65, 0.15); }
 
         .modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -305,7 +286,7 @@
     <div class="math-doodle doodle-2">Δy / Δx</div>
     <div class="math-doodle doodle-3">%</div>
 
-    <!-- СЛАЙД 1 (Твой идеальный вариант) -->
+    <!-- СЛАЙД 1 (Твой идеальный вариант из 1-го репозитория) -->
     <div class="slide active" id="slide-1" style="justify-content: center; text-align: center;">
         <h1 class="neon-stroke">On-Chain Аналитика</h1>
         <div class="subtitle">Percent Supply In Profit</div>
