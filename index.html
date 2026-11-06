@@ -249,17 +249,19 @@
         .modal-content li { margin-bottom: 15px; line-height: 1.6; color: #ccc; font-size: 1.05rem; }
         .modal-close { position: absolute; top: 15px; right: 20px; cursor: pointer; color: var(--text-muted); font-size: 1.5rem; font-weight: bold; }
 
-        /* --- ГЛАВНЫЙ СЛАЙД (АДАПТИВ) --- */
+        /* --- ГЛАВНЫЙ СЛАЙД (ЖЕСТКО ЗАФИКСИРОВАН) --- */
         #slide-1 {
             justify-content: center;
             text-align: center;
         }
         #slide-1 h1 {
-            font-size: 4rem; /* Крупный заголовок на ПК */
+            font-size: 4.5rem; /* Крупный размер как на скрине */
+            font-weight: 900;
+            letter-spacing: 2px;
             margin-bottom: 10px;
         }
         #slide-1 .subtitle {
-            font-size: 2.5rem; /* Крупный подзаголовок на ПК */
+            font-size: 2.5rem;
             margin-bottom: 30px;
         }
         #slide-1 .desc {
@@ -288,7 +290,7 @@
             .subtitle { font-size: 1.4rem; }
             
             /* Уменьшаем заголовок на 1-м слайде для телефона */
-            #slide-1 h1 { font-size: 2.2rem; }
+            #slide-1 h1 { font-size: 2.2rem; letter-spacing: 1px; }
             #slide-1 .subtitle { font-size: 1.6rem; }
             #slide-1 .desc { font-size: 0.9rem; max-width: 100%; margin-top: 20px; }
             #slide-1 .date { font-size: 0.8rem; margin-top: 30px; }
@@ -306,7 +308,6 @@
             .logo-top { top: 15px; left: 15px; }
             .math-doodle { display: none; }
             
-            /* На 6-м слайде на мобилке ужимаем цифру */
             #slide-6 .slide-6-top .huge-number { font-size: 2.5rem; }
         }
     </style>
@@ -413,7 +414,7 @@
         </div>
     </div>
 
-    <!-- СЛАЙД 6 (ПК: Ужали цифру, расширили текст. Мобилка: в колонку) -->
+    <!-- СЛАЙД 6 -->
     <div class="slide" id="slide-6">
         <h1>Текущая ситуация</h1>
         <div class="subtitle">Мы находимся здесь (WE HERE)</div>
@@ -424,7 +425,7 @@
                 <div style="font-family: 'Caveat', cursive; font-size: 1.2rem; color: var(--text-muted); margin-top: 5px;">рост за 2 месяца</div>
             </div>
             <div class="text-block">
-                <p style="font-size: 1.05rem; line-height: 1.5; margin-bottom: 0;">Снижение на метрике приостановилось на уровне <strong>54.6%</strong> → после достижения данного уровня показатель продемонстрировал сильную реакцию в восходящем направлении → образовался ярко-выраженный Low → за 2 месяца показатель продемонстрировал рост на <strong>+11.48%</strong> от Low (16 августа 2026). Подобная динамика статистически указывает на то, что появился сигнал к тому, что разворот на метрике сформирован и произошла смена тренда в пользу развития восходящей тенденции.
+                <p style="font-size: 1.05rem; line-height: 1.5; margin-bottom: 0;">Снижение на метрике приостановилось на уровне <strong>54.6%</strong> → после достижения данного уровня показатель продемонстрировал сильную реакцию в восходящем направлении → образовался ярко-выраженный Low → за 2 месяца показатель продемонстрировал рост на <strong>+11.48%</strong> от Low (16 августа 2026). Подобная динамика статистически указывает на то, что появился сигнал к тому, что разворот на метрике сформирован и произошла смена тренда в пользу развития восходящей тенденции. Иными словами, в Сентябре месяце было получено подтверждение в пользу того, что дно на метрике и цене Bitcoin сформировано, и в настоящий момент мы находимся на начальном этапе <strong>“Бычьего тренда”</strong> (на этапе его зарождения)</p>
             </div>
         </div>
 
@@ -499,7 +500,7 @@
             arrow.innerText = accordion.classList.contains('open') ? '▲' : '▼';
         }
 
-        // --- СВАЙПЫ (увеличен порог до 100px) ---
+        // Свайпы
         let touchStartX = 0;
         let touchEndX = 0;
 
@@ -513,7 +514,7 @@
         });
 
         function handleSwipe() {
-            const swipeThreshold = 100; // Увеличен порог, чтобы избежать случайных перелистываний
+            const swipeThreshold = 100; 
             if (touchEndX < touchStartX - swipeThreshold) {
                 next(); 
             }
