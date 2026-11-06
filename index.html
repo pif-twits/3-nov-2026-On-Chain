@@ -383,7 +383,7 @@
         </div>
     </div>
 
-    <!-- СЛАЙД 6 -->
+    <!-- СЛАЙД 6 (График теперь 55vh и не сжимается сеткой) -->
     <div class="slide" id="slide-6">
         <h1>Текущая ситуация</h1>
         <div class="subtitle" style="margin-bottom: 10px;">Мы находимся здесь (WE HERE)</div>
@@ -398,9 +398,11 @@
             </div>
         </div>
 
-        <!-- Вернули высоту 55vh, как на 4-м слайде -->
-        <div class="img-container" style="height: 55vh; margin-top: 15px; width: 100%;">
-            <img src="graph_current.png" alt="График текущей ситуации">
+        <!-- Сетка 1fr (картинка на всю ширину), высота 55vh (как на 4-м слайде) -->
+        <div style="display: grid; grid-template-columns: 1fr; margin-top: 15px; width: 100%;">
+            <div class="img-container" style="height: 55vh;">
+                <img src="graph_current.png" alt="График текущей ситуации">
+            </div>
         </div>
 
         <div class="comment-btn" onclick="openModal()">
