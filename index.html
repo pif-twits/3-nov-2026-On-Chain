@@ -39,7 +39,7 @@
             transition: opacity 0.5s ease, transform 0.5s ease;
             pointer-events: none;
             overflow-y: auto;
-            -webkit-overflow-scrolling: touch; /* Плавный скролл на iOS */
+            -webkit-overflow-scrolling: touch;
         }
 
         .slide.active {
@@ -223,7 +223,7 @@
         }
         .img-container img { width: 100%; height: auto; object-fit: contain; border-radius: 8px; }
 
-        .math-doodle { display: none; /* Скрываем каракули на мобилках */ }
+        .math-doodle { display: none; }
 
         /* Специфичная кнопка "Полный комментарий" */
         .comment-btn {
@@ -261,13 +261,17 @@
 
         /* АДАПТАЦИЯ ПОД МОБИЛЬНЫЕ */
         @media (max-width: 768px) {
+            .slide {
+                padding-top: 70px; /* Отступ сверху для логотипа */
+                padding-left: 15px;
+                padding-right: 15px;
+            }
             h1 { font-size: 1.5rem; }
             .subtitle { font-size: 1.4rem; }
             .content-grid { grid-template-columns: 1fr; gap: 15px; }
             .img-container { height: auto !important; margin-top: 15px; }
             .img-container img { max-height: 40vh; }
             
-            /* Переопределяем кастомные сетки для слайдов 4 и 6 */
             .slide .content-grid { grid-template-columns: 1fr !important; }
             .slide-6-top { grid-template-columns: 1fr !important; text-align: center; }
             .huge-number { font-size: 3rem; margin-bottom: 10px; }
